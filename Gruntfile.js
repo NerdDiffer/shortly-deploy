@@ -124,7 +124,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('deploy', function() {
     if (grunt.option('prod')) {
-      grunt.task.run(['shell:prodServer', 'preBuild', 'build', 'shell:nodeServer']);
+      grunt.task.run(['preBuild', 'build', 'shell:nodeServer']);
       // add your production server task here
     } else {
       grunt.task.run(['preBuild', 'build', 'shell:nodeServer']);
