@@ -3,6 +3,11 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: { separator: ';' },
+      dist: {
+        src: ['public/client/**/*.js', 'app/**/*.js', 'app/*.js', 'lib/*.js'],
+        dest: 'public/dist/<%= pkg.name %>.js'
+      }
     },
 
     mochaTest: {
@@ -10,7 +15,7 @@ module.exports = function(grunt) {
         options: {
           reporter: 'spec'
         },
-        src: ['test/**/*.js']
+        src: ['test/*.js']
       }
     },
 
@@ -21,16 +26,31 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      target: {
+        files: {
+          'public/dist/<%= pkg.name %>.min.js': ['public/client/*.js', 'app/**/*.js', 'app/*.js', 'lib/*.js']
+        }
+      }
     },
 
     eslint: {
       target: [
-        // Add list of files to lint here
+        'app/**/*.js',
+        'public/client/**/*.js',
+        'server*.js',
+        'app/*.js'  
       ]
     },
 
     cssmin: {
-        // Add list of files to lint here
+      target: {
+        files: [{
+          expand: true,
+          src: ['public/*.css', '!public/*.min.css'],
+          dest: 'public/style',
+          ext: '.min.css'
+        }]
+      }
     },
 
     watch: {
@@ -38,6 +58,8 @@ module.exports = function(grunt) {
         files: [
           'public/client/**/*.js',
           'public/lib/**/*.js',
+          'app/*.js',
+          'app/**/*.js'
         ],
         tasks: [
           'concat',
@@ -78,6 +100,9 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
+    'concat',
+    'uglify',
+    'cssmin'
   ]);
 
   grunt.registerTask('upload', function(n) {
@@ -90,7 +115,14 @@ module.exports = function(grunt) {
 
   grunt.registerTask('deploy', [
       // add your production server task here
+    'preBuild',
+    'build'
+  ]);
+  grunt.registerTask('preBuild', [
+    'test',
+    'lintMe'
   ]);
 
+  grunt.registerTask('lintMe', ['eslint']);
 
 };
