@@ -99,7 +99,7 @@ describe('Shortly Deploy in Mongo', function() {
           baseUrl: 'http://127.0.0.1:4568',
           visits: 0
         });
-
+        link.shorten();
         link.save(function() {
           done();
         });
@@ -208,12 +208,14 @@ describe('Shortly Deploy in Mongo', function() {
   }); // 'Account Creation'
 
   describe('Account Login:', function() {
-
+    var user;
     beforeEach(function(done) {
-      new User({
+      user = new User({
         'username': 'Phillip',
         'password': 'Phillip'
-      }).save(function() {
+      });
+      user.hashPassword();
+      user.save(function() {
         done();
       });
     });

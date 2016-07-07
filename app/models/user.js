@@ -8,7 +8,7 @@ var UserSchema = db.UserSchema;
 
 UserSchema.methods.comparePassword = function(attemptedPassword, callback) {
   bcrypt.compare(attemptedPassword, this.get('password'), function(err, isMatch) {
-    callback(isMatch);
+    callback(err, isMatch);
   });
 };
 
