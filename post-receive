@@ -1,0 +1,11 @@
+#!/bin/sh
+# Put this script in your git hooks repo
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-automatic-deployment-with-git-with-a-vps
+
+mkdir /opt/shortly
+
+git --work-tree=/opt/shortly --git-dir=/root/shortly.git checkout -f
+
+cd /opt/shortly
+npm install
+grunt deploy
