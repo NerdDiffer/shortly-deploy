@@ -1,11 +1,16 @@
 module.exports = function(grunt) {
+  var files = {
+    app: ['app/*.js', 'app/**/*.js'],
+    lib: ['lib/*.js'],
+    public: ['public/client/**/*.js']
+  };
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       options: { separator: ';' },
       dist: {
-        src: ['public/client/**/*.js', 'app/**/*.js', 'app/*.js', 'lib/*.js'],
+        src: files.public,
         dest: 'public/dist/<%= pkg.name %>.js'
       }
     },
@@ -28,7 +33,7 @@ module.exports = function(grunt) {
     uglify: {
       target: {
         files: {
-          'public/dist/<%= pkg.name %>.min.js': ['public/client/*.js', 'app/**/*.js', 'app/*.js', 'lib/*.js']
+          'public/dist/<%= pkg.name %>.min.js': files.public
         }
       }
     },
@@ -45,10 +50,9 @@ module.exports = function(grunt) {
     cssmin: {
       target: {
         files: [{
-          expand: true,
+          expand: false,
           src: ['public/*.css', '!public/*.min.css'],
-          dest: 'public/style',
-          ext: '.min.css'
+          dest: 'public/dist/style.min.css'
         }]
       }
     },
@@ -74,6 +78,10 @@ module.exports = function(grunt) {
 
     shell: {
       prodServer: {
+        command: 'git push live master'
+      },
+      nodeServer: {
+        command: 'node server.js'
       }
     },
   });
@@ -108,16 +116,22 @@ module.exports = function(grunt) {
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
       // add your production server task here
+      grunt.task.run(['shell:prodServer']);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
-  grunt.registerTask('deploy', [
+  grunt.registerTask('deploy', function() {
+    if (grunt.option('prod')) {
+      grunt.task.run(['shell:prodServer', 'preBuild', 'build', 'shell:nodeServer']);
       // add your production server task here
-    'preBuild',
-    'build'
-  ]);
+    } else {
+      grunt.task.run(['preBuild', 'build', 'shell:nodeServer']);
+    }
+  });
+
+
   grunt.registerTask('preBuild', [
     'test',
     'lintMe'
